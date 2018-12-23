@@ -12,7 +12,7 @@ public class Day22 {
 	// private static int depth = 510;
 	// private static int xTarget = 10;
 	// private static int yTarget = 10;
-	private static int maxOffset = 300;
+	private static int maxOffset = 500;
 	private static HashMap<String, Integer> indexMap = new HashMap<String, Integer>(10000);
 	private static HashMap<String, Integer> erosionMap = new HashMap<String, Integer>(10000);
 	private static HashMap<String, Integer> typeMap = new HashMap<String, Integer>(10000);
@@ -20,7 +20,6 @@ public class Day22 {
 	// dijkstra
 	private static HashMap<String, Integer> visited = new HashMap<String, Integer>(10000);
 	private static HashMap<String, Integer> distanceMap = new HashMap<String, Integer>(10000);
-	private static HashMap<String, String> toolMap = new HashMap<String, String>(10000);
 
 	public static void main(String[] args) {
 		long start = System.currentTimeMillis();
@@ -50,19 +49,23 @@ public class Day22 {
 		int currY = 0;
 		String currentTool = "torch";
 		int currentDistance = 0;
-		// tools: neither, both, torch, gear, notTorch, notGear
-		Pattern p = Pattern.compile("(\\d+),(\\d+)");
+		// tools: neither, torch, gear
+		Pattern p = Pattern.compile("(\\d+),(\\d+),(.+)");
 
 		while (true) {
 			// calc distances
-			calcTentativeDistance(currX, currY - 1, currentTool, currentDistance);
-			calcTentativeDistance(currX - 1, currY, currentTool, currentDistance);
-			calcTentativeDistance(currX + 1, currY, currentTool, currentDistance);
-			calcTentativeDistance(currX, currY + 1, currentTool, currentDistance);
-			visited.put(currX + "," + currY, 0);
-			if (visited.containsKey(xTarget + "," + yTarget))
+			int currentType = typeMap.get(currX + "," + currY);
+			// System.out.println("===" + currX + "," + currY + "===" + "type: " +
+			// currentType + "," + currentTool
+			// + ", distance: " + currentDistance);
+			calcTentativeDistance(currX, currY - 1, currentTool, currentDistance, currentType);
+			calcTentativeDistance(currX - 1, currY, currentTool, currentDistance, currentType);
+			calcTentativeDistance(currX + 1, currY, currentTool, currentDistance, currentType);
+			calcTentativeDistance(currX, currY + 1, currentTool, currentDistance, currentType);
+			visited.put(currX + "," + currY + "," + currentTool, 0);
+			if (visited.containsKey(xTarget + "," + yTarget + ",torch"))
 				break;
-			distanceMap.remove(currX + "," + currY);
+			distanceMap.remove(currX + "," + currY + "," + currentTool);
 			// find next node to visit
 			Iterator<Entry<String, Integer>> it = distanceMap.entrySet().iterator();
 			int shortest = 99999999;
@@ -82,51 +85,61 @@ public class Day22 {
 			m.find();
 			currX = Integer.valueOf(m.group(1));
 			currY = Integer.valueOf(m.group(2));
-			currentTool = toolMap.get(shortestKey);
+			currentTool = m.group(3);
 			currentDistance = shortest;
 		}
 		System.out.println(currentDistance);
 
 	}
 
-	private static void calcTentativeDistance(int x, int y, String currentTool, int totalDistance) {
-		if (x >= 0 && x <= xTarget + maxOffset && y >= 0 && y <= yTarget + maxOffset
-				&& !visited.containsKey(x + "," + y)) {
+	private static void calcTentativeDistance(int x, int y, String currentTool, int totalDistance, int currentType) {
+		if (x >= 0 && x <= xTarget + maxOffset && y >= 0 && y <= yTarget + maxOffset) {
 			int type = typeMap.get(x + "," + y);
 			int distance = 1 + totalDistance;
 			String newTool = currentTool;
 			switch (type) {
 			case 0: // rocky
-				if (currentTool == "neither"
-						|| (x == xTarget && y == yTarget && (currentTool == "notTorch" || currentTool == "gear"))) {
-					newTool = "both";
+				if (currentTool.equals("neither")) {
+					if (currentType == 1)
+						newTool = "gear";
+					else
+						newTool = "torch";
 					distance += 7;
+				}
+				if (x == xTarget && y == yTarget && !currentTool.equals("torch")) {
+					distance += 7;
+					newTool = "torch";
 				}
 				break;
 			case 1:// wet
-				if (currentTool == "torch") {
-					newTool = "notTorch";
+				if (currentTool.equals("torch")) {
+					if (currentType == 0)
+						newTool = "gear";
+					else
+						newTool = "neither";
 					distance += 7;
-				} else if (currentTool == "both") {
-					newTool = "gear";
-				} else if (currentTool == "notGear") {
-					newTool = "neither";
 				}
 				break;
 			case 2:// narrow
-				if (currentTool == "gear") {
-					newTool = "notGear";
+				if (currentTool.equals("gear")) {
+					if (currentType == 0)
+						newTool = "torch";
+					else
+						newTool = "neither";
 					distance += 7;
-				} else if (currentTool == "both") {
-					newTool = "torch";
-				} else if (currentTool == "notTorch") {
-					newTool = "neither";
 				}
 			}
-			if (!distanceMap.containsKey(x + "," + y) || distance < distanceMap.get(x + "," + y)) {
-				distanceMap.put(x + "," + y, distance);
-				toolMap.put(x + "," + y, newTool);
-			}
+			put(x, y, newTool, distance);
+		}
+	}
+
+	private static void put(int x, int y, String newTool, int distance) {
+		if (!visited.containsKey(x + "," + y + "," + newTool) && (!distanceMap.containsKey(x + "," + y + "," + newTool)
+				|| distance < distanceMap.get(x + "," + y + "," + newTool))) {
+			// System.out.println("-> " + x + "," + y + " type: " + typeMap.get(x + "," + y)
+			// + ", distance: " + distance
+			// + ", " + newTool);
+			distanceMap.put(x + "," + y + "," + newTool, distance);
 		}
 	}
 
