@@ -12,7 +12,8 @@ public class Day22 {
 	// private static int depth = 510;
 	// private static int xTarget = 10;
 	// private static int yTarget = 10;
-	private static int maxOffset = 500;
+	private static int maxXOffset = 20;
+	private static int maxYOffset = 50;
 	private static HashMap<String, Integer> indexMap = new HashMap<String, Integer>(10000);
 	private static HashMap<String, Integer> erosionMap = new HashMap<String, Integer>(10000);
 	private static HashMap<String, Integer> typeMap = new HashMap<String, Integer>(10000);
@@ -33,8 +34,8 @@ public class Day22 {
 				sum += typeMap.get(x + "," + y);
 		System.out.println(sum);
 		// Part2
-		for (int y = yTarget; y <= yTarget + maxOffset; y++)
-			for (int x = xTarget; x <= xTarget + maxOffset; x++)
+		for (int y = yTarget; y <= yTarget + maxYOffset; y++)
+			for (int x = xTarget; x <= xTarget + maxXOffset; x++)
 				setErosion(x, y);
 		// printMap();
 		dijkstra();
@@ -93,7 +94,7 @@ public class Day22 {
 	}
 
 	private static void calcTentativeDistance(int x, int y, String currentTool, int totalDistance, int currentType) {
-		if (x >= 0 && x <= xTarget + maxOffset && y >= 0 && y <= yTarget + maxOffset) {
+		if (x >= 0 && x <= xTarget + maxXOffset && y >= 0 && y <= yTarget + maxYOffset) {
 			int type = typeMap.get(x + "," + y);
 			int distance = 1 + totalDistance;
 			String newTool = currentTool;
@@ -106,7 +107,7 @@ public class Day22 {
 						newTool = "torch";
 					distance += 7;
 				}
-				if (x == xTarget && y == yTarget && !currentTool.equals("torch")) {
+				if (x == xTarget && y == yTarget && !newTool.equals("torch")) {
 					distance += 7;
 					newTool = "torch";
 				}
@@ -144,8 +145,8 @@ public class Day22 {
 	}
 
 	private static void printMap() {
-		for (int y = 0; y < yTarget + maxOffset; y++) {
-			for (int x = 0; x < xTarget + maxOffset; x++)
+		for (int y = 0; y < yTarget + maxYOffset; y++) {
+			for (int x = 0; x < xTarget + maxXOffset; x++)
 				System.out.print(typeMap.get(x + "," + y));
 			System.out.println();
 		}
