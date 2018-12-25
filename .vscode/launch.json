@@ -1,0 +1,168 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day1<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day1",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day10<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day10",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day11<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day11",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day12<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day12",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day13<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day13",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day14<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day14",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day15<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day15",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day16<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day16",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day17<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day17",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day18<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day18",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day19<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day19",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day2<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day2",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day21<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day21",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day22<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day22",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day23<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day23",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day3<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day3",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day4<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day4",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day5<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day5",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day6<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day6",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day7<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day7",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day8<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day8",
+            "projectName": "AoC2018"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Day9<AoC2018>",
+            "request": "launch",
+            "mainClass": "days.Day9",
+            "projectName": "AoC2018"
+        }
+    ]
+}
