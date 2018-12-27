@@ -9,6 +9,7 @@ public class Day15 {
 	private static ArrayList<Dude> dudes;
 	private static ArrayList<Dude> elves = new ArrayList<Dude>();
 	private static ArrayList<Dude> goblins = new ArrayList<Dude>();
+	private static int boost = 22;
 
 	public static void main(String[] args) {
 		input = readInput();
@@ -43,8 +44,12 @@ public class Day15 {
 	private static boolean turn(ArrayList<Dude> dudes) {
 		orderDudes(dudes);
 		for (Dude d : dudes) {
-			if (d.dead())
-				continue;
+			if (d.dead()) {
+				if (d.type == 'E')
+					return true;
+				else
+					continue;
+			}
 			// find targets
 			ArrayList<Dude> targets;
 			if (d.type == 'E')
@@ -58,8 +63,8 @@ public class Day15 {
 			Dude targetInRange = null;
 			for (Dude t: targets) {
 				if (d.isInRangeOf(t)) {
-					targetInRange = t;
-					break;
+					if (targetInRange == null || t.hp < targetInRange.hp)
+						targetInRange = t;
 				}
 				addSquare(openSquares, t.xPos,t.yPos-1);
 				addSquare(openSquares, t.xPos-1, t.yPos);
@@ -76,8 +81,8 @@ public class Day15 {
 				//try attack
 				for (Dude t: targets) {
 					if (d.isInRangeOf(t)) {
-						targetInRange = t;
-						break;
+						if (targetInRange == null || t.hp < targetInRange.hp)
+							targetInRange = t;
 					}
 				}
 				if (targetInRange != null) {
@@ -128,17 +133,17 @@ public class Day15 {
 				int y = (int) cur.y;		
 				if(input[y][x] == '.' || (d.xPos == x && d.yPos == y)) {				
 					put(d, x,y,grid, distance,seen);
-					distance++;
-					if (put(d,x,y-1,grid,distance,seen))
+					if (put(d,x,y-1,grid,distance+1,seen))
 						next.add(new Point(x,y-1));
-					if (put(d,x-1,y,grid,distance,seen))
+					if (put(d,x-1,y,grid,distance+1,seen))
 						next.add(new Point(x-1,y));
-					if (put(d,x+1,y,grid,distance,seen))
+					if (put(d,x+1,y,grid,distance+1,seen))
 						next.add(new Point(x+1,y));
-					if (put(d,x,y+1,grid,distance,seen))
+					if (put(d,x,y+1,grid,distance+1,seen))
 						next.add(new Point(x,y+1));
 				}
 			}
+				distance++;
 				current = new ArrayList<Point>(next);
 				next = new ArrayList<Point>();
 		} while (current.size() > 0);
@@ -167,10 +172,11 @@ public class Day15 {
 			this.type = type;
 			this.xPos = xPos;
 			this.yPos = yPos;
+			if (this.type == 'E')
+				this.atk += boost;
 		}
 
 		public void move(ArrayList<Point> squares, int[][][] distanceGrids) {
-			printMap();
 			int shortest = 9999;
 			int index = -1;
 			for (int i = 0; i < squares.size(); i++) {
