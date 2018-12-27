@@ -6,146 +6,163 @@ import java.util.regex.*;
 
 public class Day23 {
 	private static ArrayList<Bot> bots;
-	private static ArrayList<BoundingBox> intersections = new ArrayList<BoundingBox>();
+	private static ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+	private static String filename = "src/input/inputday23";
 
 	public static void main(String[] args) {
 		bots = readInput();
+		//part1
 		Bot strongest = findStrongest();
 		int inRange = calcNumInRangeOf(strongest);
 		System.out.println(inRange);
-		getFinalIntersections();
-		ArrayList<BoundingBox> largest = getLargest();
-		getSmallestCoordinate(largest);
-	}
-
-	private static void getSmallestCoordinate(ArrayList<BoundingBox> largest) {
-		long x = 999999999999l, y = 999999999999l, z = 999999999999l;
-		long distance = calcManhattan(x, y, z);
-		for (BoundingBox b : largest) {
-			long shortest = getShortestDistance(b);
-			if (shortest < distance) {
-				distance = shortest;
-			}
-		}
-		System.out.println(distance);
-	}
-
-	private static long getShortestDistance(BoundingBox b) {
-		long n1 = calcManhattan(b.xMin, b.yMin, b.zMin);
-		long n2 = calcManhattan(b.xMin, b.yMin, b.zMax);
-		long n3 = calcManhattan(b.xMin, b.yMax, b.zMin);
-		long n4 = calcManhattan(b.xMin, b.yMax, b.zMax);
-		long n5 = calcManhattan(b.xMax, b.yMin, b.zMin);
-		long n6 = calcManhattan(b.xMax, b.yMin, b.zMax);
-		long n7 = calcManhattan(b.xMax, b.yMax, b.zMin);
-		long n8 = calcManhattan(b.xMax, b.yMax, b.zMax);
-		long min = n1;
-		String bla = "n1";
-		min = Math.min(min, n2);
-		if (min < n1)
-			bla = "n2";
-		min = Math.min(min, n3);
-		if (min < n2)
-			bla = "n3";
-		min = Math.min(min, n4);
-		if (min < n3)
-			bla = "n4";
-		min = Math.min(min, n5);
-		if (min < n4)
-			bla = "n5";
-		min = Math.min(min, n6);
-		if (min < n5)
-			bla = "n6";
-		min = Math.min(min, n7);
-		if (min < n6)
-			bla = "n7";
-		min = Math.min(min, n8);
-		if (min < n7)
-			bla = "n8";
-		System.out.println(
-				bla + ": " + b.xMin + "," + b.xMax + "," + b.yMin + "," + b.yMax + "," + b.zMin + "," + b.zMax);
-		return min;
-	}
-
-	private static long calcManhattan(long x, long y, long z) {
-		return Math.abs(x) + Math.abs(y) + Math.abs(z);
-	}
-
-	private static ArrayList<BoundingBox> getLargest() {
-		int largest = 0;
-		for (BoundingBox b : intersections) {
-			if (b.count > largest)
-				largest = b.count;
-		}
-		ArrayList<BoundingBox> largestBoxes = new ArrayList<BoundingBox>();
-		for (BoundingBox b : intersections) {
-			if (b.count == largest)
-				largestBoxes.add(b);
-		}
-		return largestBoxes;
-	}
-
-	private static void getFinalIntersections() {
-		intersections = makeBoundingBoxesFromBots();
-		int count = 1;
-		while (count > 0) {
-			count = 0;
-			ArrayList<BoundingBox> intersectionsNew = new ArrayList<BoundingBox>(5000);
-			for (int i = 0; i < intersections.size(); i++) {
-				BoundingBox box = intersections.get(i);
-				for (int j = i + 1; j < intersections.size(); j++) {
-					BoundingBox otherBox = intersections.get(j);
-					if (box.intersects(otherBox)) {
-						BoundingBox newBox = box.shrink(otherBox);
-						newBox.count = box.count + 1;
-						intersectionsNew.add(newBox);
+		//part2
+		int maxCount = 0;
+		ArrayList<Bot> best = new ArrayList<Bot>();
+		for(int i = 0; i < bots.size(); i++) {
+			Bot a = bots.get(i);
+			int count = 0;
+			for(int j = 0; j < bots.size(); j++){
+				Bot b = bots.get(j);
+				if (rangesIntersect(a,b)) {
 						count++;
-					}
+						if(count > maxCount) {
+							maxCount = count;
+							best.removeAll(best);
+							best.add(a);
+						} else if (count == maxCount)
+							best.add(a);
 				}
 			}
-			if (count > 0)
-				intersections = intersectionsNew;
+			a.overlapping = count;
+		}
+		for (int i = bots.size() - 1; i >= 0; i--) {
+			Bot b = bots.get(i);
+			if(b.overlapping < 900 && !filename.contains("mock"))
+				bots.remove(b); 
 		}
 
+		long[][] bounds;
+		long[][] combinedBounds = null;
+		for (Bot b:bots) {
+			long x = b.x;
+			long y = b.y;
+			long z = b.z;
+			long r = b.r;
+			bounds = new long[][]{
+				{+x+y+z-r, +x+y+z+r},
+				{-x+y+z-r, -x+y+z+r},
+				{+x-y+z-r, +x-y+z+r},
+				{+x+y-z-r, +x+y-z+r}
+			};
+			if (combinedBounds == null) {
+				combinedBounds = bounds;
+			} else {
+				combinedBounds = shrink(combinedBounds, bounds);
+			}
+		}
+		long xMin = (combinedBounds[2][0] + combinedBounds[3][0]) / 2;
+		long yMin = (combinedBounds[1][0] + combinedBounds[3][0]) / 2;
+		long zMin = (combinedBounds[1][0] + combinedBounds[2][0]) / 2;
+		System.out.println(xMin+" "+yMin+" "+zMin+" Total: "+(xMin+yMin+zMin));
+/*
+		bots.sort(new BotComparator());
+		for (Bot b:best) {
+			Intersection s = new Intersection();
+			s.addBot(b);
+			intersections.add(s);
+		}
+		int lastMax;
+		maxCount = 1;
+		do {
+			lastMax = maxCount;
+			
+			for (int i = intersections.size() - 1; i >= 0; i--) {
+				Intersection s = intersections.get(i);
+				s.findNext();
+				if (s.count > maxCount) {
+					maxCount = s.count;
+					for (int j = intersections.size() - 1; j > i; j--) {
+						Intersection check = intersections.get(j);
+						if (check.count < maxCount)
+							intersections.remove(check);
+					}
+				} else if (s.count < maxCount) {
+					intersections.remove(s);
+				}
+			} 
+		} while (maxCount > lastMax);
+		System.out.println();*/
 	}
 
-	private static ArrayList<BoundingBox> makeBoundingBoxesFromBots() {
-		ArrayList<BoundingBox> intersectionsNew = new ArrayList<BoundingBox>();
-		for (Bot bot : bots) {
-			intersectionsNew.add(new BoundingBox(bot.x - bot.r, bot.x + bot.r, bot.y - bot.r, bot.y + bot.r,
-					bot.z - bot.r, bot.z + bot.r));
+	private static long[][] shrink(long[][] newBounds, long[][] bounds) {
+		long[][] combined = new long[4][2];
+		for (int i = 0; i < combined.length; i++) {
+			for (int j = 0; j < combined[0].length; j++) {
+				if (j == 0)
+					combined[i][j] = Math.max(newBounds[i][j], bounds[i][j]);
+				else
+					combined[i][j] = Math.min(newBounds[i][j], bounds[i][j]);
+			}
 		}
-		return intersectionsNew;
+		return combined;
 	}
 
-	private static class BoundingBox {
-		long xMin, xMax, yMin, yMax, zMin, zMax;
-		int count = 1;
+	private static class BotComparator implements Comparator<Bot> {
+		public int compare(Bot a, Bot b) {
+			if (a.overlapping > b.overlapping)
+				return -1;
+			if (a.overlapping == b.overlapping)
+				return 0;
+			return 1;	
+		}
+	}
 
-		public BoundingBox(long xMin, long xMax, long yMin, long yMax, long zMin, long zMax) {
-			this.xMin = xMin;
-			this.xMax = xMax;
-			this.yMin = yMin;
-			this.yMax = yMax;
-			this.zMin = zMin;
-			this.zMax = zMax;
+	private static boolean rangesIntersect(Bot a, Bot b) {
+		long distance = calcManhattan(a, b);
+		long combinedRange = a.r + b.r;
+		return distance < combinedRange;
+	}
+
+	private static class Intersection {
+		ArrayList<Bot> botsLocal = new ArrayList<Bot>();
+		int count = 0;
+
+		public void addBot(Bot b) {
+			this.botsLocal.add(b);
+			this.count++;
 		}
 
-		public BoundingBox shrink(BoundingBox otherBox) {
-			long xMinN, xMaxN, yMinN, yMaxN, zMinN, zMaxN;
-			xMinN = this.xMin > otherBox.xMin ? this.xMin : otherBox.xMin;
-			yMinN = this.yMin > otherBox.yMin ? this.yMin : otherBox.yMin;
-			zMinN = this.zMin > otherBox.zMin ? this.zMin : otherBox.zMin;
-			xMaxN = this.xMax < otherBox.xMax ? this.xMax : otherBox.xMax;
-			yMaxN = this.yMax < otherBox.yMax ? this.yMax : otherBox.yMax;
-			zMaxN = this.zMax < otherBox.zMax ? this.zMax : otherBox.zMax;
-			return new BoundingBox(xMinN, xMaxN, yMinN, yMaxN, zMinN, zMaxN);
+		public void findNext() {
+			int currentOverlap = this.botsLocal.get(this.botsLocal.size()-1).overlapping;
+			boolean found = false;
+			Bot newBot = null;
+			for (Bot b: bots) {
+				if (found) {
+					if (b.overlapping == newBot.overlapping && this.intersectsWith(b)) {
+						Intersection newI = new Intersection();
+						newI.botsLocal.addAll(this.botsLocal);
+						newI.count = this.count;
+						newI.addBot(b);
+						intersections.add(newI);
+					} else if (b.overlapping < newBot.overlapping)
+						break;
+				}
+				else if (b.overlapping < currentOverlap && this.intersectsWith(b)) {
+					newBot = b;
+					found = true;
+				}
+			}
+			if (newBot!=null) {
+				this.addBot(newBot);
+			}
 		}
 
-		public boolean intersects(BoundingBox box) {
-			// TODO Auto-generated method stub
-			return (xMin <= box.xMax && xMax >= box.xMin) && (yMin <= box.yMax && yMax >= box.yMin)
-					&& (zMin <= box.zMax && zMax >= box.zMin);
+		public boolean intersectsWith(Bot b) {
+			for (Bot a: this.botsLocal) {
+				if(!rangesIntersect(a, b))
+					return false;
+			}
+			return true;
 		}
 	}
 
@@ -162,6 +179,10 @@ public class Day23 {
 		return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
 	}
 
+	private static long calcManhattan(long x, long y, long z) {
+		return Math.abs(x) + Math.abs(y) + Math.abs(z);
+	}
+
 	private static Bot findStrongest() {
 		Bot strongest = null;
 		for (Bot b : bots) {
@@ -173,6 +194,7 @@ public class Day23 {
 
 	private static class Bot {
 		long x, y, z, r;
+		int overlapping = 0;
 
 		public Bot(long x, long y, long z, long r) {
 			this.x = x;
@@ -189,7 +211,7 @@ public class Day23 {
 		Pattern p = Pattern.compile("<(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)>,\\sr=(?<r>-?\\d+)");
 
 		try {
-			br = new BufferedReader(new FileReader("src/input/inputday23"));
+			br = new BufferedReader(new FileReader(filename));
 			String line = br.readLine();
 
 			while (line != null) {
